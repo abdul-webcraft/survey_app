@@ -22,33 +22,32 @@ public class SurveyController {
     private SurveyService surveyService;
 
     @PostMapping("survey")
-    public ResponseEntity<Survey> createSurvey(@Valid @RequestBody SurveyRequest surveyRequest) throws AlreadyExistsException, ServiceLogicException {
+    public ResponseEntity<?> createSurvey(@Valid @RequestBody SurveyRequest surveyRequest) throws AlreadyExistsException, ServiceLogicException {
         return ResponseEntity.status(HttpStatus.CREATED).body(surveyService.createSurvey(surveyRequest));
     }
 
     @GetMapping("survey/{id}")
-    public ResponseEntity<Survey> getSurveyById(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getSurveyById(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(surveyService.getSurveyById(id));
     }
 
     @GetMapping("surveys")
-    public ResponseEntity<List<Survey>> getAllSurvey() throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getAllSurvey() throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(surveyService.getAllSurveys());
     }
 
     @PutMapping("survey/{id}")
-    public ResponseEntity<Survey> updateSurvey(@PathVariable Long id, @Valid @RequestBody SurveyRequest surveyRequest) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> updateSurvey(@PathVariable Long id, @Valid @RequestBody SurveyRequest surveyRequest) throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(surveyService.updateSurvey(id, surveyRequest));
     }
 
     @DeleteMapping("survey/{id}")
-    public ResponseEntity<Void> deleteSurvey(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
-        surveyService.deleteSurvey(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteSurvey(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
+        return ResponseEntity.ok( surveyService.deleteSurvey(id));
     }
 
     @PostMapping("survey/")
-    public ResponseEntity<Survey> createSurveyWithDimensionQuestionAndAddOptions(@Valid @RequestBody SurveyRequest surveyRequest) throws AlreadyExistsException, ServiceLogicException {
+    public ResponseEntity<?> createSurveyWithDimensionQuestionAndAddOptions(@Valid @RequestBody SurveyRequest surveyRequest) throws AlreadyExistsException, ServiceLogicException {
         return ResponseEntity.status(HttpStatus.CREATED).body(surveyService.createSurveyWithDimensionQuestionAndAddOptions(surveyRequest));
     }
 }

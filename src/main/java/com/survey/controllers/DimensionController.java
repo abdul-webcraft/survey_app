@@ -22,7 +22,7 @@ public class DimensionController {
     private DimensionService dimensionService;
 
     @PostMapping("dimension/survey/{surveyId}")
-    public ResponseEntity<Dimension> createDimension(
+    public ResponseEntity<?> createDimension(
             @PathVariable Long surveyId,
             @Valid @RequestBody DimensionRequest dimensionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -30,30 +30,29 @@ public class DimensionController {
     }
 
     @PutMapping("dimension/{id}")
-    public ResponseEntity<Dimension> updateDimension(
+    public ResponseEntity<?> updateDimension(
             @PathVariable Long id,
             @Valid @RequestBody DimensionRequest dimensionRequest) throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(dimensionService.updateDimension(id, dimensionRequest));
     }
 
     @DeleteMapping("dimension/{id}")
-    public ResponseEntity<Void> deleteDimension(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
-        dimensionService.deleteDimension(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteDimension(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
+        return ResponseEntity.ok(dimensionService.deleteDimension(id));
     }
 
     @GetMapping("dimensions/survey/{surveyId}")
-    public ResponseEntity<List<Dimension>> getDimensionsBySurvey(@PathVariable Long surveyId) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getDimensionsBySurvey(@PathVariable Long surveyId) throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(dimensionService.getDimensionsBySurvey(surveyId));
     }
 
     @GetMapping("dimension/{id}")
-    public ResponseEntity<Dimension> getDimensionById(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getDimensionById(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(dimensionService.getDimensionById(id));
     }
 
     @GetMapping("dimensions")
-    public ResponseEntity<List<Dimension>> getAllDimensions() throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getAllDimensions() throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(dimensionService.getAllDimension());
     }
 }

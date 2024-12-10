@@ -8,23 +8,24 @@ import com.survey.model.Option;
 import com.survey.model.Question;
 import com.survey.payloads.request.OptionRequest;
 import com.survey.payloads.request.QuestionRequest;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface QuestionService {
 
-    Question createQuestion(Long dimensionId, QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException;
-    Question updateQuestion(Long id, QuestionRequest questionRequest) throws ResourceNotFoundException, ServiceLogicException;
-    void deleteQuestion(Long id) throws ResourceNotFoundException, ServiceLogicException;
-    List<Question> getQuestionsByDimension(Long dimensionId) throws ResourceNotFoundException, ServiceLogicException;
+    ResponseEntity<?> createQuestion(Long dimensionId, QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException;
+    ResponseEntity<?> updateQuestion(Long id, QuestionRequest questionRequest) throws ResourceNotFoundException, ServiceLogicException;
+    ResponseEntity<?> deleteQuestion(Long id) throws ResourceNotFoundException, ServiceLogicException;
+    ResponseEntity<?> getQuestionsByDimension(Long dimensionId) throws ResourceNotFoundException, ServiceLogicException;
 
-    Question getQuestionById(Long id) throws ResourceNotFoundException, ServiceLogicException;
-    List<Question> getAllQuestion() throws ResourceNotFoundException, ServiceLogicException;
+    ResponseEntity<?> getQuestionById(Long id) throws ResourceNotFoundException, ServiceLogicException;
+    ResponseEntity<?> getAllQuestion() throws ResourceNotFoundException, ServiceLogicException;
 
     // New methods for options
-    Option addOptionToQuestion(Long questionId, OptionRequest optionRequest) throws ResourceNotFoundException, BadRequestException, ServiceLogicException;
-    void removeOptionFromQuestion(Long questionId, Long optionId) throws ResourceNotFoundException, com.survey.exceptions.BadRequestException, ServiceLogicException;
+    ResponseEntity<?> addOptionToQuestion(Long questionId, OptionRequest optionRequest) throws ResourceNotFoundException, BadRequestException, ServiceLogicException;
+    ResponseEntity<?> removeOptionFromQuestion(Long questionId, Long optionId) throws ResourceNotFoundException, com.survey.exceptions.BadRequestException, ServiceLogicException;
 
-    Question createQuestionAndAddOptions(Long dimensionId,QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException;
+    ResponseEntity<?> createQuestionAndAddOptions(Long dimensionId,QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException;
 
 }

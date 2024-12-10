@@ -24,7 +24,7 @@ public class QuestionController {
     private QuestionService questionService;
 
     @PostMapping("question/dimension/{dimensionId}")
-    public ResponseEntity<Question> createQuestion(
+    public ResponseEntity<?> createQuestion(
             @PathVariable Long dimensionId,
             @Valid @RequestBody QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException , ServiceLogicException {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -32,35 +32,34 @@ public class QuestionController {
     }
 
     @PutMapping("question/{id}")
-    public ResponseEntity<Question> updateQuestion(
+    public ResponseEntity<?> updateQuestion(
             @PathVariable Long id,
             @Valid @RequestBody QuestionRequest questionRequest) throws ResourceNotFoundException ,ServiceLogicException{
         return ResponseEntity.ok(questionService.updateQuestion(id, questionRequest));
     }
 
     @DeleteMapping("question/{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) throws ResourceNotFoundException,ServiceLogicException {
-        questionService.deleteQuestion(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteQuestion(@PathVariable Long id) throws ResourceNotFoundException,ServiceLogicException {
+        return ResponseEntity.ok(questionService.deleteQuestion(id));
     }
 
     @GetMapping("question/{id}")
-    public ResponseEntity<Question> getQuestionById(@PathVariable Long id) throws ResourceNotFoundException,ServiceLogicException {
+    public ResponseEntity<?> getQuestionById(@PathVariable Long id) throws ResourceNotFoundException,ServiceLogicException {
         return ResponseEntity.ok(questionService.getQuestionById(id));
     }
 
     @GetMapping("questions")
-    public ResponseEntity<List<Question>> getAllQuestion() throws ResourceNotFoundException,ServiceLogicException {
+    public ResponseEntity<?> getAllQuestion() throws ResourceNotFoundException,ServiceLogicException {
         return ResponseEntity.ok(questionService.getAllQuestion());
     }
 
     @GetMapping("questions/dimension/{dimensionId}")
-    public ResponseEntity<List<Question>> getQuestionsByDimension(@PathVariable Long dimensionId) throws ResourceNotFoundException,ServiceLogicException {
+    public ResponseEntity<?> getQuestionsByDimension(@PathVariable Long dimensionId) throws ResourceNotFoundException,ServiceLogicException {
         return ResponseEntity.ok(questionService.getQuestionsByDimension(dimensionId));
     }
 
     @PostMapping("question/{questionId}/option")
-    public ResponseEntity<Option> addOptionToQuestion(
+    public ResponseEntity<?> addOptionToQuestion(
             @PathVariable Long questionId,
             @Valid @RequestBody OptionRequest optionRequest) throws ResourceNotFoundException, com.survey.exceptions.BadRequestException,ServiceLogicException {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -68,14 +67,13 @@ public class QuestionController {
     }
 
     @DeleteMapping("question/{questionId}/option/{optionId}")
-    public ResponseEntity<Void> removeOptionFromQuestion(
+    public ResponseEntity<?> removeOptionFromQuestion(
             @PathVariable Long questionId, @PathVariable Long optionId) throws com.survey.exceptions.BadRequestException, ResourceNotFoundException,ServiceLogicException {
-        questionService.removeOptionFromQuestion(questionId, optionId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(questionService.removeOptionFromQuestion(questionId, optionId));
     }
 
     @PostMapping("question/options/dimension/{dimensionId}")
-    public ResponseEntity<Question> createQuestionAndOptions(
+    public ResponseEntity<?> createQuestionAndOptions(
             @PathVariable Long dimensionId,
             @Valid @RequestBody QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException,ServiceLogicException {
         return ResponseEntity.status(HttpStatus.CREATED)

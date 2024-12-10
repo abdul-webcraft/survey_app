@@ -22,7 +22,7 @@ public class OptionController {
     private OptionService optionService;
 
     @PostMapping("option/question/{questionId}")
-    public ResponseEntity<Option> createOption(
+    public ResponseEntity<?> createOption(
             @PathVariable Long questionId,
             @Valid @RequestBody OptionRequest optionRequest) throws BadRequestException, ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -30,30 +30,29 @@ public class OptionController {
     }
 
     @PutMapping("option/{id}")
-    public ResponseEntity<Option> updateOption(
+    public ResponseEntity<?> updateOption(
             @PathVariable Long id,
             @Valid @RequestBody OptionRequest optionRequest) throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(optionService.updateOption(id, optionRequest));
     }
 
     @DeleteMapping("option/{id}")
-    public ResponseEntity<Void> deleteOption(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
-        optionService.deleteOption(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteOption(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
+        return ResponseEntity.ok(optionService.deleteOption(id));
     }
 
     @GetMapping("options/question/{questionId}")
-    public ResponseEntity<List<Option>> getOptionsByQuestion(@PathVariable Long questionId) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getOptionsByQuestion(@PathVariable Long questionId) throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(optionService.getOptionsByQuestion(questionId));
     }
 
     @GetMapping("option/{id}")
-    public ResponseEntity<Option> getOptionById(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getOptionById(@PathVariable Long id) throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(optionService.getOptionById(id));
     }
 
     @GetMapping("options")
-    public ResponseEntity<List<Option>> getAllOptions() throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getAllOptions() throws ResourceNotFoundException, ServiceLogicException {
         return ResponseEntity.ok(optionService.getAllOptions());
     }
 }

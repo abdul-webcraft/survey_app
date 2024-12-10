@@ -6,11 +6,14 @@ import com.survey.exceptions.ServiceLogicException;
 import com.survey.model.Dimension;
 import com.survey.model.Survey;
 import com.survey.payloads.request.DimensionRequest;
+import com.survey.payloads.response.ApiResponse;
 import com.survey.repository.DimensionRepository;
 import com.survey.repository.SurveyRepository;
 import com.survey.services.DimensionService;
 import com.survey.services.SurveyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,19 +31,19 @@ public class DimensionServiceImpl implements DimensionService {
     private SurveyService surveyService;
 
     @Override
-    public Dimension createDimension(Long surveyId, DimensionRequest dimensionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException {
+    public ResponseEntity<?> createDimension(Long surveyId, DimensionRequest dimensionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException {
         try {
-            //        Survey survey = surveyRepository.findById(surveyId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Survey not found"));
-            Survey survey = surveyService.getSurveyById(surveyId);
+                    Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Survey not found"));
+//            Survey survey = surveyService.getSurveyById(surveyId);
             if(dimensionRepository.existsByName(dimensionRequest.getName())){
                 throw new AlreadyExistsException("Dimension are Already exists !!");
             }
             Dimension dimension=new Dimension();
             dimension.setName(dimensionRequest.getName());
             dimension.setSurvey(survey);
-            return dimensionRepository.save(dimension);
-        }catch (ResourceNotFoundException e){
+            Dimension savedDimension = dimensionRepository.save(dimension);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(HttpStatus.CREATED.name(),savedDimension ));        }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
             throw new ServiceLogicException();
@@ -49,13 +52,14 @@ public class DimensionServiceImpl implements DimensionService {
     }
 
     @Override
-    public Dimension updateDimension(Long id, DimensionRequest dimensionRequest) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> updateDimension(Long id, DimensionRequest dimensionRequest) throws ResourceNotFoundException, ServiceLogicException {
         try {
-            //        Dimension existing = dimensionRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Dimension not found"));
-            Dimension dimension = getDimensionById(id);
+                    Dimension dimension = dimensionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Dimension not found"));
+//            Dimension dimension = getDimensionById(id);
             dimension.setName(dimensionRequest.getName());
-            return dimensionRepository.save(dimension);
+            Dimension updatedDimension = dimensionRepository.save(dimension);
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),updatedDimension ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -65,13 +69,13 @@ public class DimensionServiceImpl implements DimensionService {
     }
 
     @Override
-    public void deleteDimension(Long id) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> deleteDimension(Long id) throws ResourceNotFoundException, ServiceLogicException {
         try {
-           //        if (!dimensionRepository.existsById(id)) {
-//            throw new ResourceNotFoundException("Dimension not found");
-//        }
-                Dimension dimension = getDimensionById(id);
+            Dimension dimension = dimensionRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Dimension not found"));
+//                Dimension dimension = getDimensionById(id);
                 dimensionRepository.deleteById(dimension.getId());
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.NO_CONTENT.name(),"Dimension deleted successfully !!" ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -81,14 +85,16 @@ public class DimensionServiceImpl implements DimensionService {
     }
 
     @Override
-    public List<Dimension> getDimensionsBySurvey(Long surveyId) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getDimensionsBySurvey(Long surveyId) throws ResourceNotFoundException, ServiceLogicException {
         try {
-            Survey survey = surveyService.getSurveyById(surveyId);
+            Survey survey = surveyRepository.findById(surveyId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Survey not found"));
+//            Survey survey = surveyService.getSurveyById(surveyId);
             List<Dimension> dimensions = dimensionRepository.findBySurveyId(survey.getId());
             if(dimensions.isEmpty()){
                 throw new ResourceNotFoundException("Dimensions are not exists");
             }
-            return dimensions;
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),dimensions ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -98,10 +104,11 @@ public class DimensionServiceImpl implements DimensionService {
     }
 
     @Override
-    public Dimension getDimensionById(Long id) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getDimensionById(Long id) throws ResourceNotFoundException, ServiceLogicException {
         try {
-            return dimensionRepository.findById(id)
-                    .orElseThrow(()->new ResourceNotFoundException("Dimension not found"));
+            Dimension dimension = dimensionRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Dimension not found"));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),dimension ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -111,13 +118,13 @@ public class DimensionServiceImpl implements DimensionService {
     }
 
     @Override
-    public List<Dimension> getAllDimension() throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getAllDimension() throws ResourceNotFoundException, ServiceLogicException {
         try {
             List<Dimension> dimensions = dimensionRepository.findAll();
             if(dimensions.isEmpty()){
                 throw new ResourceNotFoundException("Dimension are not exists !!");
             }
-            return dimensions;
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),dimensions ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){

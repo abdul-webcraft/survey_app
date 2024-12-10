@@ -10,6 +10,7 @@ import com.survey.model.Option;
 import com.survey.model.Question;
 import com.survey.payloads.request.OptionRequest;
 import com.survey.payloads.request.QuestionRequest;
+import com.survey.payloads.response.ApiResponse;
 import com.survey.repository.DimensionRepository;
 import com.survey.repository.OptionRepository;
 import com.survey.repository.QuestionRepository;
@@ -17,6 +18,8 @@ import com.survey.services.DimensionService;
 import com.survey.services.OptionService;
 import com.survey.services.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,11 +41,11 @@ public class QuestionServiceImpl implements QuestionService {
     private DimensionService dimensionService;
 
     @Override
-    public Question createQuestion(Long dimensionId, QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException {
+    public ResponseEntity<?> createQuestion(Long dimensionId, QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException {
         try {
-            //        Dimension dimension = dimensionRepository.findById(dimensionId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Dimension not found"));
-            Dimension dimension = dimensionService.getDimensionById(dimensionId);
+                    Dimension dimension = dimensionRepository.findById(dimensionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Dimension not found"));
+//            Dimension dimension = dimensionService.getDimensionById(dimensionId);
             if(questionRepository.existsByText(questionRequest.getText())){
                 throw new AlreadyExistsException("Question are Already exist !!");
             }
@@ -50,7 +53,8 @@ public class QuestionServiceImpl implements QuestionService {
             question.setText(questionRequest.getText());
             question.setType(questionRequest.getType());
             question.setDimension(dimension);
-            return questionRepository.save(question);
+            Question savedQuestion = questionRepository.save(question);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(HttpStatus.CREATED.name(),savedQuestion ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -60,14 +64,15 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Question updateQuestion(Long id, QuestionRequest questionRequest) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> updateQuestion(Long id, QuestionRequest questionRequest) throws ResourceNotFoundException, ServiceLogicException {
         try {
-            //        Question existing = questionRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
-            Question question = getQuestionById(id);
+                    Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
+//            Question question = getQuestionById(id);
             question.setText(questionRequest.getText());
             question.setType(questionRequest.getType());
-            return questionRepository.save(question);
+            Question updatedQuestion = questionRepository.save(question);
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),updatedQuestion ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -77,10 +82,13 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void deleteQuestion(Long id) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> deleteQuestion(Long id) throws ResourceNotFoundException, ServiceLogicException {
         try {
-            Question question = getQuestionById(id);
+            Question question = questionRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
+//            Question question = getQuestionById(id);
             questionRepository.deleteById(question.getId());
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.NO_CONTENT.name(),"Question deleted successfully !!" ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -90,14 +98,16 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<Question> getQuestionsByDimension(Long dimensionId) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getQuestionsByDimension(Long dimensionId) throws ResourceNotFoundException, ServiceLogicException {
         try {
-            Dimension dimension = dimensionService.getDimensionById(dimensionId);
+            Dimension dimension = dimensionRepository.findById(dimensionId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Dimension not found"));
+//            Dimension dimension = dimensionService.getDimensionById(dimensionId);
             List<Question> questions = questionRepository.findByDimensionId(dimension.getId());
             if(questions.isEmpty()){
                 throw new ResourceNotFoundException("Question are not exists !!");
             }
-            return questions;
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),questions ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -107,10 +117,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Question getQuestionById(Long id) throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getQuestionById(Long id) throws ResourceNotFoundException, ServiceLogicException {
         try {
-            return questionRepository.findById(id)
+            Question question = questionRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),question ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -120,13 +131,13 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<Question> getAllQuestion() throws ResourceNotFoundException, ServiceLogicException {
+    public ResponseEntity<?> getAllQuestion() throws ResourceNotFoundException, ServiceLogicException {
         try {
             List<Question> questions = questionRepository.findAll();
             if(questions.isEmpty()){
                 throw new ResourceNotFoundException("Question are not exists !!");
             }
-            return questions;
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),questions ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -136,18 +147,19 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Option addOptionToQuestion(Long questionId, OptionRequest optionRequest) throws ResourceNotFoundException, BadRequestException, ServiceLogicException {
+    public ResponseEntity<?> addOptionToQuestion(Long questionId, OptionRequest optionRequest) throws ResourceNotFoundException, BadRequestException, ServiceLogicException {
         try {
-            //        Question question = questionRepository.findById(questionId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
-            Question question = getQuestionById(questionId);
+                    Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
+//            Question question = getQuestionById(questionId);
             if (question.getType() == QuestionType.COMMENT) {
                 throw new BadRequestException("Comment type questions cannot have options");
             }
             Option option=new Option();
             option.setText(optionRequest.getText());
             option.setQuestion(question);
-            return optionRepository.save(option);
+            Option savedOption = optionRepository.save(option);
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),savedOption ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -157,7 +169,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void removeOptionFromQuestion(Long questionId, Long optionId) throws ResourceNotFoundException, BadRequestException, ServiceLogicException {
+    public ResponseEntity<?> removeOptionFromQuestion(Long questionId, Long optionId) throws ResourceNotFoundException, BadRequestException, ServiceLogicException {
         try {
             Option option = optionRepository.findById(optionId)
                     .orElseThrow(() -> new ResourceNotFoundException("Option not found"));
@@ -165,6 +177,7 @@ public class QuestionServiceImpl implements QuestionService {
                 throw new BadRequestException("Option does not belong to the specified question");
             }
             optionRepository.delete(option);
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.NO_CONTENT.name(),"Option deleted successfully !!" ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
@@ -174,9 +187,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Question createQuestionAndAddOptions(Long dimensionId, QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException {
+    public ResponseEntity<?> createQuestionAndAddOptions(Long dimensionId, QuestionRequest questionRequest) throws ResourceNotFoundException, AlreadyExistsException, ServiceLogicException {
         try {
-            Dimension dimension = dimensionService.getDimensionById(dimensionId);
+            Dimension dimension = dimensionRepository.findById(dimensionId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Dimension not found"));
+//            Dimension dimension = dimensionService.getDimensionById(dimensionId);
             if(questionRepository.existsByText(questionRequest.getText())){
                 throw new AlreadyExistsException("Question are Already exist !!");
             }
@@ -200,7 +215,7 @@ public class QuestionServiceImpl implements QuestionService {
                 optionRepository.saveAll(options);
             }
 
-            return savedQuestion;
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(HttpStatus.OK.name(),savedQuestion ));
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(e.getMessage());
         }catch (Exception e){
